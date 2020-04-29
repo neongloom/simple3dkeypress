@@ -13,6 +13,7 @@ let clock = new THREE.Clock();
 let mouse = new THREE.Vector2(),
   INTERSECTED;
 let raycaster;
+let model;
 
 let mixer;
 
@@ -87,7 +88,6 @@ function init() {
   ground.receiveShadow = true;
 
   let gltfLoader = new GLTFLoader();
-  let model;
 
   gltfLoader.load('sa_keycap-7deg.glb', gltf => {
     model = gltf.scene;
@@ -130,6 +130,8 @@ function init() {
   raycaster = new THREE.Raycaster();
 
   window.addEventListener('resize', onWindowResize, false);
+  window.addEventListener('keydown', keyDown, false);
+  window.addEventListener('keyup', keyUp, false);
   // window.addEventListener('mousemove', onDocumentMouseMove, false);
 }
 
@@ -137,6 +139,25 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function keyDown(e) {
+  const key = e.key;
+  if (key == 'Enter') {
+    model.traverse(obj => {
+      if (obj.name == 'sa_low') obj.position.y -= 0.1;
+    });
+  }
+  console.log(key);
+}
+function keyUp(e) {
+  const key = e.key;
+  if (key == 'Enter') {
+    model.traverse(obj => {
+      if (obj.name == 'sa_low') obj.position.y += 0.1;
+    });
+  }
+  console.log(key);
 }
 
 function animate() {
