@@ -71,30 +71,24 @@ function init() {
   scene.add(light);
   // scene.add(light.target);
 
-  let keyMat = new THREE.MeshStandardMaterial({
-    color: 0x1a342a,
-    metalness: 0,
-    roughness: 1
+  let floorTex = [
+    new THREE.TextureLoader().load('mat/plastic_grain_Base_Color.jpg'),
+    new THREE.TextureLoader().load('mat/plastic_grain_Metallic.jpg'),
+    new THREE.TextureLoader().load('mat/plastic_grain_Normal.jpg'),
+    new THREE.TextureLoader().load('mat/plastic_grain_Roughness.jpg')
+  ];
+
+  floorTex.forEach(i => {
+    i.wrapS = THREE.RepeatWrapping;
+    i.wrapT = THREE.RepeatWrapping;
+    i.repeat.set(4, 4);
   });
 
-  let baseColorTex = new THREE.TextureLoader().load(
-    'mat/cast_concrete_blocks_wood_Base_Color.jpg'
-  );
-  let metallic = new THREE.TextureLoader().load(
-    'mat/cast_concrete_blocks_wood_Metallic.jpg'
-  );
-  let normal = new THREE.TextureLoader().load(
-    'mat/cast_concrete_blocks_wood_Normal.jpg'
-  );
-  let roughness = new THREE.TextureLoader().load(
-    'mat/cast_concrete_blocks_wood_Roughness.jpg'
-  );
-
   let deskMat = new THREE.MeshStandardMaterial({
-    map: baseColorTex,
-    metalnessMap: metallic,
-    normalMap: normal,
-    roughnessMap: roughness,
+    map: floorTex[0],
+    metalnessMap: floorTex[1],
+    normalMap: floorTex[2],
+    roughnessMap: floorTex[3],
     color: 0x404040
   });
 
