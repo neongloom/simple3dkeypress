@@ -3,6 +3,7 @@ import * as THREE from './build/three.module.js';
 import Stats from './jsm/stats.module.js';
 
 import { OrbitControls } from './jsm/OrbitControls.js';
+// import { TransformControls } from './jsm/TransformControls';
 import { GLTFLoader } from './jsm/GLTFLoader.js';
 import { DRACOLoader } from './jsm/DRACOLoader.js';
 
@@ -14,8 +15,9 @@ let mouse = new THREE.Vector2(),
   INTERSECTED;
 let raycaster;
 let model;
+let pressed = false;
 
-let mixer;
+let mixer, clipAction, clipAction2;
 
 init();
 animate();
@@ -67,11 +69,6 @@ function init() {
   light.shadow.radius = 5;
   light.decay = 2;
 
-  // light.shadow.camera.top = 10;
-  // light.shadow.camera.bottom = -10;
-  // light.shadow.camera.left = -10;
-  // light.shadow.camera.right = 10;
-
   scene.add(light);
   // scene.add(light.target);
 
@@ -89,6 +86,29 @@ function init() {
 
   let gltfLoader = new GLTFLoader();
 
+  let positionKF = new THREE.VectorKeyframeTrack(
+    '.position',
+    [0, 0.1],
+    [0, 0, 0, 0, -0.1, 0]
+  );
+  let releasePositionKF = new THREE.VectorKeyframeTrack(
+    '.position',
+    [0, 0.1],
+    [0, 0, 0, 0, 0.1, 0]
+  );
+
+  let colorKF = new THREE.ColorKeyframeTrack(
+    '.material.color',
+    [0, 1, 2],
+    [1, 0, 0, 0, 1, 0, 0, 0, 1],
+    THREE.InterpolateDiscrete
+  );
+
+  // create an animation sequence with the tracks
+  //
+  let clip = new THREE.AnimationClip('Action', 0.2, [positionKF]);
+  let clip2 = new THREE.AnimationClip('Action2', 0.2, [releasePositionKF]);
+
   gltfLoader.load('sa_keycap-7deg.glb', gltf => {
     model = gltf.scene;
     model.rotation.y = Math.PI;
@@ -99,14 +119,30 @@ function init() {
       if (obj.castShadow !== undefined) {
         obj.castShadow = true;
         obj.receiveShadow = true;
-        // obj.material = keyMat;
-        // obj.material.color = 0xffff00;
-        // obj.material = new THREE.MeshNormalMaterial();
+
+        // setup the THREE.AnimationMixer
+        mixer = new THREE.AnimationMixer(obj);
+        clipAction = mixer.clipAction(clip);
+        clipAction.setLoop(THREE.LoopOnce);
+        clipAction.clampWhenFinished = true;
+        clipAction2 = mixer.clipAction(clip2);
+        clipAction2.setLoop(THREE.LoopOnce);
+        clipAction2.clampWhenFinished = true;
+
+        mixer.addEventListener('finished', e => {
+          if (e.action._clip.name === 'Action2') {
+            clipAction2.reset();
+            clipAction2.stop();
+            clipAction.reset();
+            clipAction.stop();
+          }
+        });
       }
       // if (obj.isMesh) {
       //   roughnessMipmapper.generateMipmaps(obj.material);
       // }
     });
+
     // roughnessMipmapper.dispose();
   });
 
@@ -144,20 +180,25 @@ function onWindowResize() {
 function keyDown(e) {
   const key = e.key;
   if (key == 'Enter') {
+    pressed = true;
     model.traverse(obj => {
-      if (obj.name == 'sa_low') obj.position.y -= 0.1;
+      if (obj.name == 'sa_low') {
+        clipAction.play();
+      }
     });
   }
-  console.log(key);
 }
+
 function keyUp(e) {
   const key = e.key;
+  pressed = false;
   if (key == 'Enter') {
     model.traverse(obj => {
-      if (obj.name == 'sa_low') obj.position.y += 0.1;
+      if (obj.name == 'sa_low') {
+        clipAction2.play();
+      }
     });
   }
-  console.log(key);
 }
 
 function animate() {
@@ -166,6 +207,7 @@ function animate() {
   let delta = clock.getDelta();
 
   // controls.update(delta);
+  if (mixer) mixer.update(delta);
   stats.update();
 
   renderer.render(scene, camera);

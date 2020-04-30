@@ -6,4 +6,3 @@ To do:
 
 - click with mouse to interact with button
 - animate movement
-- stop translating button when enter 'key' is pressed down
