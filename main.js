@@ -55,7 +55,7 @@ function init() {
   scene.add(light);
 
   light = new THREE.DirectionalLight(0xb59fa0);
-  light.intensity = 2;
+  light.intensity = 3;
   light.position.set(-3, 8, 2);
   light.target.position.set(0, 0, 0);
   light.castShadow = true;
@@ -77,8 +77,29 @@ function init() {
     roughness: 1
   });
 
+  let baseColorTex = new THREE.TextureLoader().load(
+    'mat/cast_concrete_blocks_wood_Base_Color.jpg'
+  );
+  let metallic = new THREE.TextureLoader().load(
+    'mat/cast_concrete_blocks_wood_Metallic.jpg'
+  );
+  let normal = new THREE.TextureLoader().load(
+    'mat/cast_concrete_blocks_wood_Normal.jpg'
+  );
+  let roughness = new THREE.TextureLoader().load(
+    'mat/cast_concrete_blocks_wood_Roughness.jpg'
+  );
+
+  let deskMat = new THREE.MeshStandardMaterial({
+    map: baseColorTex,
+    metalnessMap: metallic,
+    normalMap: normal,
+    roughnessMap: roughness,
+    color: 0x404040
+  });
+
   // ground
-  let ground = new THREE.Mesh(new THREE.PlaneBufferGeometry(20, 20), keyMat);
+  let ground = new THREE.Mesh(new THREE.PlaneBufferGeometry(20, 20), deskMat);
   ground.rotation.x = -Math.PI / 2;
   scene.add(ground);
   ground.receiveShadow = true;
@@ -118,6 +139,7 @@ function init() {
       if (obj.castShadow !== undefined) {
         obj.castShadow = true;
         obj.receiveShadow = true;
+        if (obj.material) obj.material.metalness = 1;
 
         // setup the THREE.AnimationMixer
         mixer = new THREE.AnimationMixer(obj);
@@ -158,9 +180,9 @@ function init() {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
 
-  controls = new OrbitControls(camera, renderer.domElement);
-  controls.target.set(0, 0, 0);
-  controls.update();
+  // controls = new OrbitControls(camera, renderer.domElement);
+  // controls.target.set(0, 0, 0);
+  // controls.update();
 
   raycaster = new THREE.Raycaster();
 
