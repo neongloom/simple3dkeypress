@@ -113,7 +113,7 @@ function init() {
   );
   let releasePositionKF = new THREE.VectorKeyframeTrack(
     '.position',
-    [0, 0.1],
+    [0, 0.05],
     [0, 0, 0, 0, 0.1, 0]
   );
 
@@ -126,8 +126,8 @@ function init() {
 
   // create an animation sequence with the tracks
   //
-  let clip = new THREE.AnimationClip('Action', 0.2, [positionKF]);
-  let clip2 = new THREE.AnimationClip('Action2', 0.2, [releasePositionKF]);
+  let clip = new THREE.AnimationClip('Action', 0.1, [positionKF]);
+  let clip2 = new THREE.AnimationClip('Action2', 0.05, [releasePositionKF]);
 
   gltfLoader.load('sa_keycap-7deg.glb', gltf => {
     model = gltf.scene;

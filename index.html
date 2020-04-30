@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang='en'>
+<html lang="en">
   <head>
-    <meta charset='UTF-8' />
+    <meta charset="UTF-8" />
     <title>simple keypress</title>
     <style>
       body {
@@ -20,12 +20,23 @@
         display: block;
       }
 
+      #info {
+        position: absolute;
+        top: 0;
+        width: 90vw;
+        padding: 24px;
+        text-align: center;
+        z-index: 1;
+          color: white;
+      }
     </style>
   </head>
 
   <body>
-  <div id='container'></div>
-  <script type='module' src='./main.js'></script>
+    <div id="container"></div>
+    <div id="info">
+      Press the 'enter' key on keyboard or click with mouse to move the button on-screen
+    </div>
+    <script type="module" src="./main.js"></script>
   </body>
-
 </html>
