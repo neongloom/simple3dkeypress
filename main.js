@@ -3,7 +3,6 @@ import * as THREE from './build/three.module.js';
 import Stats from './jsm/stats.module.js';
 
 import { OrbitControls } from './jsm/OrbitControls.js';
-// import { TransformControls } from './jsm/TransformControls';
 import { GLTFLoader } from './jsm/GLTFLoader.js';
 import { DRACOLoader } from './jsm/DRACOLoader.js';
 
@@ -168,7 +167,9 @@ function init() {
   window.addEventListener('resize', onWindowResize, false);
   window.addEventListener('keydown', keyDown, false);
   window.addEventListener('keyup', keyUp, false);
-  // window.addEventListener('mousemove', onDocumentMouseMove, false);
+  window.addEventListener('mousemove', onDocumentMouseMove, false);
+  window.addEventListener('mousedown', onMouseDown, false);
+  window.addEventListener('mouseup', onMouseUp, false);
 }
 
 function onWindowResize() {
@@ -225,53 +226,77 @@ function onDocumentMouseMove(event) {
 
 function onMouseDown(e) {
   e.preventDefault();
+  camera.updateMatrixWorld();
+  raycaster.setFromCamera(mouse, camera);
+
+  // let intersects = raycaster.intersectObjects(scene.children, true);
+  let intersects = raycaster.intersectObject(model, true);
+
+  if (intersects.length > 0) {
+    if (
+      INTERSECTED != intersects[0].object &&
+      intersects[0].object.name === 'sa_low' &&
+      pressed == false
+    ) {
+      pressed = true;
+      clipAction.play();
+    }
+  }
 }
 
 function onMouseUp(e) {
   e.preventDefault();
+  if (pressed == true) {
+    pressed = false;
+    clipAction2.play();
+  }
 }
 
-// function render() {
-//   camera.updateMatrixWorld();
-//   raycaster.setFromCamera(mouse, camera);
+function render() {
+  camera.updateMatrixWorld();
+  raycaster.setFromCamera(mouse, camera);
 
-//   let intersects = raycaster.intersectObjects(scene.children, true);
-//   // let intersects = raycaster.intersectObject('case', true);
+  // let intersects = raycaster.intersectObjects(scene.children, true);
+  let intersects = raycaster.intersectObject(model, true);
 
-//   if (intersects.length > 0) {
-//     console.log(intersects[0]);
-//     if (
-//       INTERSECTED != intersects[0].object &&
-//       intersects[0].object.name[0] == 'k'
-//     ) {
-//       if (INTERSECTED) {
-//         // INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-//         INTERSECTED.rotation.x -= 0.1;
-//       }
+  if (intersects.length > 0) {
+    console.log(intersects[0]);
+    if (
+      INTERSECTED != intersects[0].object &&
+      intersects[0].object.name[0] == 'sa_low'
+    ) {
+      let button = intersects[0].object;
+      if (INTERSECTED) {
+        button.material.emissive.setHex(INTERSECTED.currentHex);
+        button.rotation.x -= 0.1;
+        clipAction.play();
+      }
 
-//       INTERSECTED = intersects[0].object;
-//       INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-//       // INTERSECTED.material.emissive.setHex(0xff0000);
+      INTERSECTED = intersects[0].object;
+      INTERSECTED.currentHex = button.material.emissive.getHex();
+      button.material.emissive.setHex(0xff0000);
 
-//       INTERSECTED.rotation.x += 0.1;
-//     }
-//   } else {
-//     if (INTERSECTED) {
-//       // INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-//       INTERSECTED.rotation.x -= 0.1;
-//     }
+      button.rotation.x += 0.1;
+      clipAction2.play();
+    }
+  } else {
+    if (INTERSECTED) {
+      INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+      INTERSECTED.rotation.x -= 0.1;
+      clipAction.play();
+    }
 
-//     INTERSECTED = null;
-//   }
-//   renderer.render(scene, camera);
-// }
+    INTERSECTED = null;
+  }
+  renderer.render(scene, camera);
+}
 
-// function getIntersects(x, y) {
-//   x = (x / window.innerWidth) * 2 - 1;
-//   y = -(y / window.innerHeight) * 2 + 1;
+function getIntersects(x, y) {
+  x = (x / window.innerWidth) * 2 - 1;
+  y = -(y / window.innerHeight) * 2 + 1;
 
-//   mouseVector.set(x, y, 0.5);
-//   raycaster.setFromCamera(mouseVector, camera);
+  mouseVector.set(x, y, 0.5);
+  raycaster.setFromCamera(mouseVector, camera);
 
-//   return raycaster.intersectObject(group, true);
-// }
+  return raycaster.intersectObject(group, true);
+}

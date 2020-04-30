@@ -1,8 +1,11 @@
 # simple keypress
 
-Hit 'enter' key on keyboard to move button on screen
+Hit 'enter' key on keyboard or click with mouse to move button on screen
 
 To do:
 
-- click with mouse to interact with button
-- animate movement
+- cleanup
+
+Known issues:
+
+- animation bugs out when 'enter' key or mouse button clicked rapidly
