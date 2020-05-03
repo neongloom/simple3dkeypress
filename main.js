@@ -195,26 +195,16 @@ function onWindowResize() {
 }
 
 function keyDown(e) {
-  const key = e.key;
-  if (key == 'Enter') {
+  if (e.code == 'Enter' && pressed == false) {
     pressed = true;
-    model.traverse(obj => {
-      if (obj.name == 'sa_low') {
-        clipAction.play();
-      }
-    });
+    clipAction.play();
   }
 }
 
 function keyUp(e) {
-  const key = e.key;
   pressed = false;
-  if (key == 'Enter') {
-    model.traverse(obj => {
-      if (obj.name == 'sa_low') {
-        clipAction2.play();
-      }
-    });
+  if (e.code == 'Enter') {
+    clipAction2.play();
   }
 }
 
@@ -231,8 +221,6 @@ function animate() {
   // render();
 }
 
-// let selectedObject = null;
-
 function onDocumentMouseMove(event) {
   event.preventDefault();
 
@@ -245,7 +233,6 @@ function onMouseDown(e) {
   camera.updateMatrixWorld();
   raycaster.setFromCamera(mouse, camera);
 
-  // let intersects = raycaster.intersectObjects(scene.children, true);
   let intersects = raycaster.intersectObject(model, true);
 
   if (intersects.length > 0) {
@@ -272,7 +259,6 @@ function render() {
   camera.updateMatrixWorld();
   raycaster.setFromCamera(mouse, camera);
 
-  // let intersects = raycaster.intersectObjects(scene.children, true);
   let intersects = raycaster.intersectObject(model, true);
 
   if (intersects.length > 0) {
